@@ -55,74 +55,32 @@ def login_cadastro():
 @app.route("/")
 @login_required
 def index():
-    if request.method == "POST":
-        # Lógica para processar os dados do formulário
-        pass
-    else:
-        conn = get_db_connection()
-        planos = conn.execute("SELECT * FROM aula ORDER BY data_aula DESC LIMIT 4").fetchall()
-        conn.close()
-        return render_template("index.html", planos=planos)
+    conn = get_db_connection()
+    planos = conn.execute("SELECT * FROM aula ORDER BY data_aula DESC LIMIT 4").fetchall()
+    conn.close()
+    return render_template("index.html", planos=planos)
+
+# ROTAS DE PLANO DE AULA
 
 # Rota para exibir detalhes de uma aula específica
-@app.route("/pagina_aula/<int:plano_id>")
+@app.route("/planos_de_aula/pagina_aula/<int:plano_id>")
 @login_required
 def pagina_aula(plano_id):
     conn = get_db_connection()
     plano = conn.execute("SELECT * FROM aula WHERE id = ?", (plano_id,)).fetchone()
+    cadernetas = conn.execute("SELECT * FROM caderneta WHERE plano_id = ?", (plano_id,)).fetchall()
     conn.close()
     if plano:
-        return render_template("pagina_aula.html", plano=plano, plano_id=plano_id)
+        return render_template("plano_de_aula/pagina_aula.html", plano=plano, plano_id=plano_id, cadernetas=cadernetas)
     else:
         abort(404)
 
-# Rota para editar um plano de aula
-@app.route("/editar_plano/<int:plano_id>", methods=["GET", "POST"])
-@login_required
-def editar_plano(plano_id):
-    if request.method == "POST":
-        # Verifica se todos os campos necessários estão presentes
-        if all(field in request.form for field in ['titulo', 'data_aula', 'turma', 'semestre', 'conteudo_programatico', 'metodologia', 'recursos_necessarios', 'avaliacao_observacoes', 'observacoes', 'eventos_extraordinarios']):
-            titulo = request.form.get('titulo')
-            data_aula = request.form.get('data_aula')
-            turma = request.form.get('turma')
-            semestre = request.form.get('semestre')
-            conteudo_programatico = request.form.get('conteudo_programatico')
-            metodologia = request.form.get('metodologia')
-            recursos_necessarios = request.form.get('recursos_necessarios')
-            avaliacao_observacoes = request.form.get('avaliacao_observacoes')
-            observacoes = request.form.get('observacoes')
-            eventos_extraordinarios = request.form.get('eventos_extraordinarios')
-
-            conn = get_db_connection()
-            conn.execute("""
-                UPDATE aula
-                SET titulo = ?, data_aula = ?, turma = ?, semestre = ?, conteudo_programatico = ?, metodologia = ?, 
-                    recursos_necessarios = ?, avaliacao_observacoes = ?, observacoes = ?, eventos_extraordinarios = ?
-                WHERE id = ?
-            """, (titulo, data_aula, turma, semestre, conteudo_programatico, metodologia, recursos_necessarios, avaliacao_observacoes, observacoes, eventos_extraordinarios, plano_id))
-            conn.commit()
-            conn.close()
-
-            return redirect(url_for("pagina_aula", plano_id=plano_id))
-        else:
-            # Retorna um erro ou redireciona para uma página de erro, pois algum campo obrigatório está faltando
-            flash('Todos os campos são obrigatórios.')
-            return redirect(url_for("editar_plano", plano_id=plano_id))
-    else:
-        conn = get_db_connection()
-        plano = conn.execute("SELECT * FROM aula WHERE id = ?", (plano_id,)).fetchone()
-        conn.close()
-        if not plano:
-            abort(404)
-        return render_template("editar_plano.html", plano=plano, plano_id=plano_id)
 
 # Rota para o formulário de criação de plano de aula
-@app.route("/formulario", methods=['GET', 'POST'])
+@app.route("/planos_de_aula/formulario", methods=['GET', 'POST'])
 @login_required
 def formulario():
     if request.method == 'POST':
-        data_aula
         data_aula = request.form['data_aula']
         turma = request.form['turma']
         semestre = request.form['semestre']
@@ -143,7 +101,7 @@ def formulario():
         conn.commit()
         conn.close()
         return redirect(url_for('planos_de_aula'))
-    return render_template('formulario.html')
+    return render_template('planos_de_aula/formulario.html')
 
 # Rota para excluir um plano de aula
 @app.route("/excluir_plano/<int:plano_id>", methods=["POST"])
@@ -156,13 +114,20 @@ def excluir_plano(plano_id):
     return redirect(url_for("planos_de_aula"))
 
 # Rota para exibir todos os planos de aula
-@app.route("/planos_de_aula")
+@app.route("/planos_de_aula/planos_de_aula")
 @login_required
 def planos_de_aula():
     conn = get_db_connection()
     planos = conn.execute("SELECT * FROM aula").fetchall()
     conn.close()
-    return render_template("planos_de_aula.html", planos=planos)
+    return render_template("planos_de_aula/planos_de_aula.html", planos=planos)
+
+
+# ROTAS DE CADERNETAS
+
+@app.route('/cadernetas')
+def cadernetas():
+    return render_template('cadernetas/pagina_caderneta.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

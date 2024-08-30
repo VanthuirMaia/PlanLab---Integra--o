@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de Cadernetas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css') }}">
+</head>
+
+<body>
+    <div class="conteiner">
+        <nav>
+            <div class="img">
+                <img src="{{ url_for('static', filename='img/planlab logo branco p.png') }}" alt="Logo PlanLab">
+            </div>
+            <ul class="side-itens">
+                <li class="side-item-box">
+                    <a href="{{ url_for('index') }}">
+                        <img src="{{ url_for('static', filename='img/MaterialSymbolsHomeOutlineRounded.png') }}"
+                            alt="Home">
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="side-item-box">
+                    <a href="{{ url_for('planos_de_aula') }}">
+                        <img src="{{ url_for('static', filename='img/MaterialSymbolsContractEditOutlineRounded.png') }}"
+                            alt="Planos de Aula">
+                        <span>Planos de Aula</span>
+                    </a>
+                </li>
+                <li class="side-item-box active">
+                    <a href="{{ url_for('listar_cadernetas') }}">
+                        <img src="{{ url_for('static', filename='img/MaterialSymbolscadenetaToAppRounded.png') }}"
+                            alt="Cadernetas">
+                        <span>Cadernetas</span>
+                    </a>
+                </li>
+                <li class="side-item-box">
+                    <a href="#">
+                        <img src="{{ url_for('static', filename='img/MaterialSymbolsExitToAppRounded.png') }}"
+                            alt="Sair">
+                        <span>Sair</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <header>
+            <div class="usuario">
+                <img src="https://randomuser.me/api/portraits/women/24.jpg" alt="">
+                <div>
+                    <strong class="user-nome">Aurora Silva</strong>
+                    <div class="cargo"><span>Professor(a)</span></div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <h1>Listagem de Cadernetas</h1>
+            <div class="cadernetas-lista">
+                {% for caderneta in cadernetas %}
+                <div class="caderneta-item">
+                    <h2>{{ caderneta.titulo }}</h2>
+                    <p><strong>Data de Criação:</strong> {{ caderneta.data_criacao }}</p>
+                    <a href="{{ url_for('detalhes_caderneta', caderneta_id=caderneta.id) }}"
+                        class="botao-acoes botao-ver-detalhes">Ver Detalhes</a>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="botoes-opcoes">
+                <a href="{{ url_for('criar_caderneta') }}" class="botao-acoes botao-criar">Criar Nova Caderneta</a>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container-footer">
+                <p>© 2024 PlanLab. Todos os direitos reservados.</p>
+                <p>Contato: <a href="mailto:info@planlab.com">info@planlab.com</a> | Telefone: +55 123 456 7890</p>
+                <div class="social-icons">
+                    <a href="#"><img src="{{ url_for('static', filename='img/SimpleIconsFacebook.png') }}"
+                            alt="Facebook"></a>
+                    <a href="#"><img src="{{ url_for('static', filename='img/SimpleIconsInstagram.png') }}"
+                            alt="Instagram"></a>
+                    <a href="#"><img src="{{ url_for('static', filename='img/LogosGithubIcon.png') }}" alt="Github"></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

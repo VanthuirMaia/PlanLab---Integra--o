@@ -17,6 +17,7 @@ def get_db_connection():
 
 # Criação das tabelas
 def create_tables(conn):
+    # Tabela de usuários
     conn.execute('''
         CREATE TABLE IF NOT EXISTS usuario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,6 +26,8 @@ def create_tables(conn):
             senha TEXT NOT NULL
         )
     ''')
+
+    # Tabela de aulas (planos de aula)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS aula (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,9 +45,25 @@ def create_tables(conn):
             FOREIGN KEY(usuario_id) REFERENCES usuario(id)
         )
     ''')
+
+    # Tabela de cadernetas associadas aos planos de aula
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS caderneta (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            plano_id INTEGER NOT NULL,
+            data_criacao TEXT DEFAULT (DATE('now')),
+            anotacoes TEXT,
+            participacao TEXT,
+            conteudo_trabalhado TEXT,
+            atividades TEXT,
+            FOREIGN KEY (plano_id) REFERENCES aula(id) ON DELETE CASCADE
+        )
+    ''')
+
     conn.commit()
     inserir_dados_iniciais(conn)
 
+# Inserir dados iniciais
 def inserir_dados_iniciais(conn):
     usuarios = conn.execute('SELECT * FROM usuario').fetchall()
     if not usuarios:
